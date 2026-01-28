@@ -15,8 +15,14 @@ import SettingsView from './components/SettingsView';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
-    const saved = localStorage.getItem('gp_active_session');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('gp_active_session');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      console.error("CRITICAL: Failed to restore session from localStorage.", e);
+      localStorage.removeItem('gp_active_session'); // Clear corrupted state
+      return null;
+    }
   });
   
   const [activeView, setActiveView] = useState<ViewType>(ViewType.DASHBOARD);
@@ -24,14 +30,20 @@ const App: React.FC = () => {
   // Sync current user with localStorage whenever it changes
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('gp_active_session', JSON.stringify(currentUser));
-      
-      // Also update in the global user registry
-      const dbKey = currentUser.role === 'ADMIN' ? 'gp_admins' : 'gp_users';
-      const accounts = JSON.parse(localStorage.getItem(dbKey) || '{}');
-      if (accounts[currentUser.id]) {
-        accounts[currentUser.id].profile = currentUser;
-        localStorage.setItem(dbKey, JSON.stringify(accounts));
+      try {
+        localStorage.setItem('gp_active_session', JSON.stringify(currentUser));
+        
+        // Also update in the global user registry
+        const dbKey = currentUser.role === 'ADMIN' ? 'gp_admins' : 'gp_users';
+        const accountsRaw = localStorage.getItem(dbKey);
+        const accounts = accountsRaw ? JSON.parse(accountsRaw) : {};
+        
+        if (accounts[currentUser.id]) {
+          accounts[currentUser.id].profile = currentUser;
+          localStorage.setItem(dbKey, JSON.stringify(accounts));
+        }
+      } catch (e) {
+        console.error("Sync error:", e);
       }
     }
   }, [currentUser]);
@@ -48,7 +60,7 @@ const App: React.FC = () => {
 
   const updateUserProfile = (updatedProfile: Partial<UserProfile>) => {
     if (currentUser) {
-      setCurrentUser({ ...currentUser, ...updatedProfile });
+      setCurrentUser(prev => prev ? { ...prev, ...updatedProfile } : null);
     }
   };
 

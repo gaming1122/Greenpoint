@@ -1,10 +1,11 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export async function getSustainabilityInsights(bottlesCount: number) {
   try {
+    // Instantiate inside the function to ensure process.env.API_KEY is accessed 
+    // only when the function is actually called, preventing top-level module crashes.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Calculate the environmental impact of collecting ${bottlesCount} plastic bottles. 
@@ -17,6 +18,6 @@ export async function getSustainabilityInsights(bottlesCount: number) {
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "Unable to generate insights at this time.";
+    return "Unable to generate insights at this time. Please check your connectivity or API configuration.";
   }
 }
