@@ -3,8 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 
 export async function getSustainabilityInsights(bottlesCount: number) {
   try {
-    // Correctly initialize with process.env.API_KEY directly as per @google/genai guidelines
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+    // Initializing with process.env.API_KEY directly as per @google/genai guidelines
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -16,7 +16,7 @@ export async function getSustainabilityInsights(bottlesCount: number) {
       Keep it brief and professional.`,
     });
     
-    // Using the text property directly instead of text() method
+    // Accessing the .text property directly (not a method call) as per the latest SDK requirements
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);

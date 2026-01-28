@@ -1,9 +1,9 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 
-// Removed manual process.env definition to comply with @google/genai coding guidelines
+console.log('index.tsx: Booting Application...');
 
 interface Props {
   children: ReactNode;
@@ -14,18 +14,22 @@ interface State {
   error: Error | null;
 }
 
+// Added constructor to ensure proper initialization and inheritance of props in ErrorBoundary
 class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   public render() {
@@ -37,10 +41,11 @@ class ErrorBoundary extends Component<Props, State> {
             <h1 className="text-3xl font-black text-white tracking-tighter mb-4">Node Runtime Crash</h1>
             <p className="text-slate-400 font-medium mb-8 leading-relaxed">
               The application encountered a critical exception during execution. 
-              This usually occurs due to missing environment variables or failed module resolution.
+              This usually occurs due to missing environment variables or module resolution failures.
             </p>
             <div className="bg-black/50 p-4 rounded-xl text-left text-rose-400 text-xs mono overflow-x-auto mb-8 max-h-40">
-              {this.state.error?.message}
+              {this.state.error?.message || 'Unknown Error'}
+              {this.state.error?.stack && <pre className="mt-2 text-[10px] opacity-50">{this.state.error.stack}</pre>}
             </div>
             <button 
               onClick={() => window.location.reload()}
@@ -53,21 +58,26 @@ class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    // Fix: Class components must access children via this.props.children
     return this.props.children;
   }
 }
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
+  console.error('FATAL: Root element not found');
   throw new Error("Could not find root element to mount to");
 }
 
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </React.StrictMode>
-);
+try {
+  const root = createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </React.StrictMode>
+  );
+  console.log('index.tsx: Render called successfully.');
+} catch (err) {
+  console.error('FATAL: Failed to initialize React root:', err);
+}

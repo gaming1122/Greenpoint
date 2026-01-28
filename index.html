@@ -52,16 +52,25 @@
         font-family: monospace;
       }
     </style>
+    <script>
+      // Crucial: Polyfill process for React and other libraries that expect it
+      window.process = { 
+        env: { 
+          NODE_ENV: 'production',
+          // API_KEY is injected by the platform
+        } 
+      };
+    </script>
 <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
     "react-dom": "https://esm.sh/react-dom@19.0.0",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
     "recharts": "https://esm.sh/recharts@2.15.0",
-    "@google/genai": "https://esm.sh/@google/genai@0.21.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/"
+    "@google/genai": "https://esm.sh/@google/genai@0.21.0"
   }
 }
 </script>
@@ -73,9 +82,10 @@
       <pre id="error-message"></pre>
       <button onclick="location.reload()" style="background: #333; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;">Reload Application</button>
     </div>
-    <script type="module" src="./index.tsx"></script>
+    <script type="module" src="index.tsx"></script>
     <script>
       window.onerror = function(msg, url, lineNo, columnNo, error) {
+        console.error('Window Error:', msg, 'at', url, ':', lineNo);
         const errorBoundary = document.getElementById('error-boundary');
         const errorMessage = document.getElementById('error-message');
         if (errorBoundary && errorMessage) {
@@ -84,6 +94,7 @@
         }
         return false;
       };
+      console.log('Main HTML parsed, index.tsx loading...');
     </script>
 </body>
 </html>
