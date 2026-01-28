@@ -1,89 +1,92 @@
 
-import React from 'react';
-
-const mockStudents = [
-  { rank: 1, name: 'Alex Rivera', id: 'STU-1029', bottles: 452, points: 4520, avatar: 'https://picsum.photos/seed/alex/40/40' },
-  { rank: 2, name: 'Sarah Chen', id: 'STU-1044', bottles: 412, points: 4120, avatar: 'https://picsum.photos/seed/sarah/40/40' },
-  { rank: 3, name: 'Jordan Smith', id: 'STU-0982', bottles: 388, points: 3880, avatar: 'https://picsum.photos/seed/jordan/40/40' },
-  { rank: 4, name: 'Emily Blunt', id: 'STU-1122', bottles: 350, points: 3500, avatar: 'https://picsum.photos/seed/emily/40/40' },
-  { rank: 5, name: 'David Miller', id: 'STU-1055', bottles: 310, points: 3100, avatar: 'https://picsum.photos/seed/david/40/40' },
-];
+import React, { useMemo } from 'react';
+import { UserProfile } from '../types';
 
 const LeaderboardView: React.FC = () => {
+  const users = useMemo(() => {
+    const rawUsers = JSON.parse(localStorage.getItem('gp_users') || '{}');
+    const userList: UserProfile[] = Object.values(rawUsers).map((u: any) => u.profile);
+    
+    // Sort by points descending
+    return userList.sort((a, b) => b.points - a.points);
+  }, []);
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-      <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+    <div className="bg-[#0f1115] rounded-[2.5rem] border border-white/5 overflow-hidden glass shadow-2xl animate-in fade-in duration-500">
+      <div className="p-8 border-b border-white/5 flex justify-between items-center">
         <div>
-          <h3 className="text-xl font-bold text-slate-800">Top Recyclers</h3>
-          <p className="text-sm text-slate-500">Current Semester Rankings</p>
+          <h3 className="text-2xl font-black text-white tracking-tighter">Global Ranking</h3>
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mono mt-1">Real-time contribution data</p>
         </div>
-        <div className="flex space-x-2">
-          <button className="bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors">
-            Export Report
-          </button>
+        <div className="bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
+          <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{users.length} Registered Nodes</span>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      
+      <div className="overflow-x-auto scrollbar-hide">
         <table className="w-full">
           <thead>
-            <tr className="bg-slate-50/50 text-left">
-              <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Rank</th>
-              <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Student</th>
-              <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Bottles</th>
-              <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Points</th>
-              <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Rewards Earned</th>
-              <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Action</th>
+            <tr className="text-left text-[10px] font-black text-slate-600 uppercase tracking-widest mono border-b border-white/5">
+              <th className="px-8 py-6">Rank</th>
+              <th className="px-8 py-6">Contributor</th>
+              <th className="px-8 py-6">Bottles</th>
+              <th className="px-8 py-6">Points</th>
+              <th className="px-8 py-6 text-right">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
-            {mockStudents.map((student) => (
-              <tr key={student.id} className="hover:bg-slate-50 transition-colors group">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                    student.rank === 1 ? 'bg-yellow-100 text-yellow-700' : 
-                    student.rank === 2 ? 'bg-slate-100 text-slate-700' : 
-                    student.rank === 3 ? 'bg-orange-100 text-orange-700' : 'text-slate-500'
+          <tbody className="divide-y divide-white/5">
+            {users.length > 0 ? users.map((user, index) => (
+              <tr key={user.id} className="group hover:bg-white/5 transition-colors">
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-inner ${
+                    index === 0 ? 'bg-amber-400 text-amber-950 shadow-amber-300/50' : 
+                    index === 1 ? 'bg-slate-300 text-slate-900' : 
+                    index === 2 ? 'bg-orange-400 text-orange-950' : 'bg-white/5 text-slate-500'
                   }`}>
-                    {student.rank}
+                    {index + 1}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-3">
-                    <img src={student.avatar} alt="" className="w-10 h-10 rounded-full border border-slate-200" />
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <div className="flex items-center space-x-4">
+                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} alt="" className="w-12 h-12 rounded-xl border border-white/10 bg-[#05070a]" />
                     <div>
-                      <div className="text-sm font-bold text-slate-800">{student.name}</div>
-                      <div className="text-xs text-slate-400 font-medium">{student.id}</div>
+                      <div className="text-sm font-black text-white">{user.name}</div>
+                      <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">{user.id}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">
-                  {student.bottles}
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <span className="text-sm font-black text-slate-300 mono">{user.bottles} Units</span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
-                    {student.points.toLocaleString()} pts
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <span className="bg-emerald-500/10 text-emerald-500 px-3 py-1.5 rounded-lg text-xs font-black mono border border-emerald-500/20">
+                    {user.points.toLocaleString()} XP
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex space-x-1">
-                    {[1, 2, 3].slice(0, 4 - student.rank).map((_, i) => (
-                      <i key={i} className="fas fa-gift text-orange-400 text-xs"></i>
-                    ))}
+                <td className="px-8 py-6 whitespace-nowrap text-right">
+                  <div className="flex items-center justify-end space-x-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Active</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <button className="text-slate-400 hover:text-slate-600 transition-colors">
-                    <i className="fas fa-ellipsis-v"></i>
-                  </button>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={5} className="px-8 py-20 text-center">
+                  <i className="fas fa-users-slash text-4xl text-slate-800 mb-4 block"></i>
+                  <p className="text-slate-500 font-black uppercase tracking-widest text-xs">No active nodes detected in registry</p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-      <div className="p-4 bg-slate-50/50 text-center border-t border-slate-100">
-        <button className="text-sm font-semibold text-green-600 hover:text-green-700">View All 1,240 Students</button>
-      </div>
+      
+      {users.length > 0 && (
+        <div className="p-6 bg-white/5 text-center border-t border-white/5">
+          <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mono">End of encrypted ranking stream</p>
+        </div>
+      )}
     </div>
   );
 };

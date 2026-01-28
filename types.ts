@@ -8,6 +8,8 @@ export interface UserProfile {
   points: number;
   bottles: number;
   joinedAt: string;
+  prioJonName?: string;
+  prioJonContact?: string;
 }
 
 export enum ViewType {
@@ -19,5 +21,5 @@ export enum ViewType {
   USER_MANAGEMENT = 'USER_MANAGEMENT',
   SYSTEM_LOGS = 'SYSTEM_LOGS',
   MY_PROFILE = 'MY_PROFILE',
-  SCAN_ID = 'SCAN_ID'
+  SETTINGS = 'SETTINGS'
 }

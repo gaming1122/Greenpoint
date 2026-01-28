@@ -12,68 +12,69 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange, onLogout, role, userName }) => {
   const adminItems = [
-    { id: ViewType.DASHBOARD, icon: 'fa-grid-2', label: 'Telemetry', desc: 'System status' },
-    { id: ViewType.USER_MANAGEMENT, icon: 'fa-users-gear', label: 'Directory', desc: 'Manage nodes' },
-    { id: ViewType.IOT_FIRMWARE, icon: 'fa-microchip', label: 'Hardware', desc: 'IoT logic' },
-    { id: ViewType.SYSTEM_LOGS, icon: 'fa-list-ul', label: 'Cloud Logs', desc: 'Traffic stream' },
+    { id: ViewType.DASHBOARD, icon: 'fa-chart-pie', label: 'Monitor', desc: 'System status' },
+    { id: ViewType.USER_MANAGEMENT, icon: 'fa-user-group', label: 'Directory', desc: 'Manage nodes' },
+    { id: ViewType.IOT_FIRMWARE, icon: 'fa-code-branch', label: 'Hardware', desc: 'IoT logic' },
+    { id: ViewType.SYSTEM_LOGS, icon: 'fa-terminal', label: 'Console', desc: 'Cloud stream' },
   ];
 
   const userItems = [
-    { id: ViewType.MY_PROFILE, icon: 'fa-user-circle', label: 'My Wallet', desc: 'Point balance' },
-    { id: ViewType.AI_INSIGHTS, icon: 'fa-sparkles', label: 'Neural AI', desc: 'Eco analysis' },
+    { id: ViewType.MY_PROFILE, icon: 'fa-wallet', label: 'Wallet', desc: 'Point balance' },
+    { id: ViewType.AI_INSIGHTS, icon: 'fa-wand-magic-sparkles', label: 'AI Eco', desc: 'Analysis' },
   ];
 
   const commonItems = [
-    { id: ViewType.LEADERBOARD, icon: 'fa-fire', label: 'Top Tiers', desc: 'Global ranking' },
+    { id: ViewType.LEADERBOARD, icon: 'fa-ranking-star', label: 'Ranking', desc: 'Top contributors' },
+    { id: ViewType.SETTINGS, icon: 'fa-sliders', label: 'Config', desc: 'Preferences' },
   ];
 
   const activeItems = role === 'ADMIN' ? [...adminItems, ...commonItems] : [...userItems, ...commonItems];
   const themeColor = role === 'ADMIN' ? 'text-indigo-400' : 'text-emerald-500';
   const activeBg = role === 'ADMIN' ? 'bg-indigo-600' : 'bg-emerald-500';
+  const activeText = role === 'ADMIN' ? 'text-white' : 'text-slate-900';
 
   return (
-    <aside className="w-24 md:w-80 bg-[#05070a] border-r border-white/5 flex flex-col transition-all duration-300 relative z-20">
-      <div className="p-8 pb-12">
-        <div className="flex items-center space-x-4">
-          <div className={`${activeBg} w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl rotate-3`}>
-            <i className={`fas ${role === 'ADMIN' ? 'fa-shield-halved' : 'fa-leaf'} ${role === 'ADMIN' ? 'text-white' : 'text-slate-900'} text-2xl`}></i>
+    <aside className="w-20 md:w-64 bg-[#0a0c10] border-r border-white/5 flex flex-col transition-all duration-300 relative z-20">
+      <div className="p-6 mb-4">
+        <div className="flex items-center space-x-3">
+          <div className={`${activeBg} w-10 h-10 rounded-xl flex items-center justify-center shadow-lg`}>
+            <i className={`fas ${role === 'ADMIN' ? 'fa-shield-check' : 'fa-seedling'} ${role === 'ADMIN' ? 'text-white' : 'text-slate-900'} text-lg`}></i>
           </div>
           <div className="hidden md:block">
-            <h2 className="text-xl font-black text-white tracking-tighter leading-none">GP-<span className={themeColor}>{role}</span></h2>
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mt-1 mono">Secure Node</p>
+            <h2 className="text-lg font-black text-white tracking-tighter leading-none">GP-<span className={themeColor}>{role}</span></h2>
           </div>
         </div>
       </div>
       
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto scrollbar-hide">
+      <nav className="flex-1 px-3 space-y-1.5 overflow-y-auto scrollbar-hide">
         {activeItems.map((item) => (
           <button
             key={item.id}
             onClick={() => onViewChange(item.id)}
-            className={`w-full flex items-center space-x-4 px-5 py-4 rounded-3xl transition-all duration-300 group ${
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
               activeView === item.id 
-                ? `${activeBg} text-${role === 'ADMIN' ? 'white' : 'slate-900'} shadow-xl` 
+                ? `${activeBg} ${activeText} shadow-lg shadow-emerald-500/10` 
                 : 'hover:bg-white/5 text-slate-400 hover:text-white'
             }`}
           >
-            <div className={`w-10 h-10 flex items-center justify-center rounded-2xl ${activeView === item.id ? 'bg-black/10' : 'bg-white/5'}`}>
-              <i className={`fas ${item.icon} text-lg`}></i>
+            <div className={`w-8 h-8 flex items-center justify-center rounded-lg ${activeView === item.id ? 'bg-black/10' : 'bg-white/5'}`}>
+              <i className={`fas ${item.icon} text-sm`}></i>
             </div>
             <div className="hidden md:block text-left">
-              <span className="block font-black text-xs uppercase tracking-widest">{item.label}</span>
-              <span className="text-[9px] font-bold opacity-60 block mt-0.5">{item.desc}</span>
+              <span className="block font-bold text-xs uppercase tracking-wider">{item.label}</span>
+              <span className="text-[9px] font-medium opacity-50 block mt-0.5">{item.desc}</span>
             </div>
           </button>
         ))}
       </nav>
 
-      <div className="p-6 mt-auto">
+      <div className="p-4 border-t border-white/5">
         <button 
           onClick={onLogout}
-          className="w-full flex items-center justify-center md:justify-start space-x-4 px-5 py-5 rounded-3xl text-rose-500 hover:bg-rose-500/10 transition-all font-black text-xs uppercase tracking-widest"
+          className="w-full flex items-center justify-center md:justify-start space-x-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-all font-bold text-xs uppercase tracking-wider"
         >
-          <i className="fas fa-power-off text-lg"></i>
-          <span className="hidden md:block">Disconnect Node</span>
+          <i className="fas fa-sign-out-alt text-sm"></i>
+          <span className="hidden md:block">Disconnect</span>
         </button>
       </div>
     </aside>
